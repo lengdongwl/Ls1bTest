@@ -1,0 +1,120 @@
+/*
+ * ld.script
+ */
+
+_RamSize = DEFINED(_RamSize) ? _RamSize : 64M;
+_StackSize = DEFINED(_StackSize) ? _StackSize : 0x4000; /* 16k */
+
+OUTPUT_ARCH(mips)
+
+ENTRY(start)            /* Entry point of application */
+
+MEMORY
+{
+    ram (wx) : ORIGIN = 0x80000000, LENGTH = 64M
+}
+
+SECTIONS
+{
+    /* Code and read-only data 0x80200000 */
+
+    .text 0x80200000 :
+    {
+        _ftext = ABSOLUTE(.) ;  /* Start of code and read-only data */
+        *(.text*)
+        _ecode = ABSOLUTE(.) ;  /* End of code */
+        *(.rodata*)
+        . = ALIGN(8);
+        _etext = ABSOLUTE(.);   /* End of code and read-only data */
+    } > ram
+
+    .eh_frame_hdr : 
+    { 
+         *(.eh_frame_hdr) 
+         *(.eh_frame_entry)
+    }
+    .eh_frame : ONLY_IF_RO { KEEP (*(.eh_frame)) }
+
+    .data :
+    {
+        _fdata = ABSOLUTE(.);   /* Start of initialised data */
+        *(.data*)
+        *(.gcc_except_table*)
+   
+        . = ALIGN(4);
+        __CTOR_LIST__ = ABSOLUTE(.);
+        KEEP(*(SORT(.ctors*)))
+        __CTOR_END__ = ABSOLUTE(.);
+        __DTOR_LIST__ = ABSOLUTE(.);
+        KEEP(*(SORT(.dtors*)))
+        __DTOR_END__ = ABSOLUTE(.);
+
+        . = ALIGN(8);
+        _gp = ABSOLUTE(. + 0x7ff0); /* Base of small data */
+
+        *(.lit8) 
+        *(.lit4) 
+        *(.sdata) 
+
+        . = ALIGN(8);
+        _edata  = ABSOLUTE(.);  /* End of initialised data */
+    } > ram
+
+    .dynamic :       {*(.dynamic)      } > ram
+    .interp :        {*(.interp)       } > ram
+    .rel.dyn :       {*(.rel.dyn)      } > ram
+    .gnu.version_d : {*(.gnu.version_d)} > ram
+    .gnu.version :   {*(.gnu.version)  } > ram
+    .gnu.version_r : {*(.gnu.version_r)} > ram
+    .dynsym :        {*(.dynsym)       } > ram
+    .dynstr :        {*(.dynstr)       } > ram
+    .hash :          {*(.hash)         } > ram
+  
+    /* Uninitialised data */
+    . = ALIGN(4);
+    _fbss = .;          /* Start of uninitialised data */
+
+    .sbss : 
+    { 
+        *(.sbss) 
+        *(.scommon)
+    }
+  
+    .bss :
+    {
+        *(.bss)
+        *(COMMON)
+        /* Allocate room for stack */
+        . = ALIGN(8) ;
+        _stack_start = .;
+        . += _StackSize;    
+        _stack_end = .;
+        
+        _freemem = .;
+    }
+
+    _end = . ;          /* End of unitialised data */
+
+    .gptab.sdata : 
+    {
+        *(.gptab.data)
+        *(.gptab.sdata) 
+    }
+    
+    .gptab.sbss :  
+    {
+        *(.gptab.bss)  
+        *(.gptab.sbss)  
+    }
+
+    /DISCARD/ :
+    {
+        *(.reginfo)
+    }
+
+    PROVIDE(etext = _etext);
+    PROVIDE(edata = .);
+    PROVIDE(end = .);
+}
+
+

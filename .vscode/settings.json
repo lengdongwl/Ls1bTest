@@ -1,0 +1,25 @@
+{
+    "files.associations": {
+        "hc595.h": "c",
+        "led.h": "c",
+        "ls1x_fb.h": "c",
+        "timers.h": "c",
+        "task.h": "c",
+        "ns16550.h": "c",
+        "key.h": "c",
+        "smg.h": "c",
+        "freertos.h": "c",
+        "hmc5883l_drv.h": "c",
+        "fan_resistance_control_drv.h": "c",
+        "pwm_ic.h": "c",
+        "mips.h": "c",
+        "ls1b_gpio.h": "c",
+        "motor_drv.h": "c",
+        "adc.h": "c",
+        "ads1015.h": "c",
+        "gp7101.h": "c",
+        "simple_gui.h": "c",
+        "demo_gui.h": "c",
+        "gt1151.h": "c"
+    }
+}
