@@ -1,4 +1,4 @@
-# simple gui库使用
+# 龙芯simple gui库的使用
 ## 该库仅有button与gird两种组件 
 ## 使用freeRTOS下的运行流程
 
