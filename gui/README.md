@@ -23,7 +23,7 @@ TGrid *create_grid(TRect *rt, int rows, int cols, int guid, int group);//创建�
 ```
 
 start_gui_monitor_task(); //启动任务
-int set_gui_active_group(int group);//设置活动组
+int set_gui_active_group(int group);//设置活动组 监视任务只监视该组的组件 
 
 
 
