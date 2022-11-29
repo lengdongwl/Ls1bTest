@@ -295,6 +295,38 @@ void func_task_color()
 }
 
 
+void func_task_Other1(void *arg)
+{
+    volatile int x,y;
+    volatile char buf[50];
+    volatile float distance;
+
+    printk("func_task_Other1 thread started!\n");
+    x = 500;
+    y = 42;
+    while(1)
+    {
+        distance = Ultrasonic_Get_Dist();
+        sprintf(buf,"距离:%.2f cm",distance);
+        fb_fillrect(x + 5*8,y,x+200,y+16,cidxSILVER);
+        fb_textout(x,y,buf);
+        if(distance > 20)
+        {
+            Motor_set_pwm(0);//占空比越小 速度越大
+        }else if(distance < 20 && distance >= 10)
+        {
+            Motor_set_pwm(30-distance);//电机转速随被测距离较小而减小
+        }else if(distance < 10)
+        {
+            Motor_set_pwm(100);
+        }
+        delay_ms(200);
+
+
+    }
+}
+
+
 
 QueueHandle_t ADCQueueHandle;
 void func_task_ADC(void *arg)
@@ -312,6 +344,9 @@ void func_task_ADC(void *arg)
         delay_ms(1);
     }
 }
+
+
+
 
 #define ADC_bit ((1<<12)-1) //12位adc
 #define WAVE_HEIGHT 300

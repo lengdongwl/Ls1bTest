@@ -30,6 +30,11 @@ void func_task_img();
 void func_task_color();
 
 void func_task_ADC(void *arg);
+
+void func_task_Other1(void *arg);
+void func_task_Other2(void *arg);
+void func_task_Other3(void *arg);
+
 void func_task_Wave(void *arg);
 
 

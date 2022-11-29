@@ -565,6 +565,58 @@ static void func_onclick_0008(unsigned msg, void *param)
     }
 }
 
+/*其他*/
+TaskHandle_t handle_Other1,handle_Other2,handle_Other3;
+static void func_onclick_0009(unsigned msg, void *param)
+{
+    TButton *btn = (TButton *)param;
+
+    if(!(strcmp(btn->caption,"初始化")))
+    {
+        if(func_task_status[9][4]==pdPASS)
+        {
+            func_task_status[9][4] = 0;
+            Motor_set_pwm(100);
+            vTaskDelete(handle_Other1);
+            vTaskDelete(handle_Motor);
+        }
+    }else if(!(strcmp(btn->caption,"其他任务1")))/*通过超声波测距来控制电机速度*/
+    {
+        
+        
+        Motor_Interrupt_Init();//这个影响freeRTOS谨慎开关使用 电机中断次数读取
+        if(func_task_status[9][4]==pdPASS)
+        {
+            return;
+        }
+        if(xTaskCreate(menu_task(Other1),//其他任务进程
+                       "Other",
+                       2048,
+                       NULL,
+                       30,
+                       &handle_Other1)==pdPASS)
+        {
+            func_task_status[9][4]=xTaskCreate(menu_task(Motor),
+                                           "Motor",
+                                           2048,
+                                           NULL,
+                                           30,
+                                           &handle_Motor);//显示电机转速任务
+                                           
+        }
+      
+        
+    }else if(!(strcmp(btn->caption,"其他任务2")))
+    {
+        
+    }else if(!(strcmp(btn->caption,"其他任务3")))
+    {
+        
+    }
+}
+    
+
+
 static int create_buttons_main(void)
 {
     TRect rect;
@@ -619,6 +671,12 @@ static int create_buttons_main(void)
     rect.right  = rect.left + BUTTON_WIDTH;
     rect.bottom = rect.top + BUTTON_HEIGHT;
     new_button(&rect, id++, MAIN_GROUP , "屏幕显示", main_onclick_func);
+    
+    rect.left   = MENU_2X;
+    rect.top    = rect.top ;
+    rect.right  = rect.left + BUTTON_WIDTH;
+    rect.bottom = rect.top + BUTTON_HEIGHT;
+    new_button(&rect, id++, MAIN_GROUP , "其他", main_onclick_func);
 
 
     /*LED灯*/
@@ -883,6 +941,34 @@ static int create_buttons_main(void)
     rect.right  = rect.left + BUTTON_WIDTH;
     rect.bottom = rect.top + BUTTON_HEIGHT;
     new_button(&rect, id++, MAIN_GROUP|0x0008 , "波形显示", menu_func(0008));
+    
+    
+     /*其他*/
+    rect.left   = MENU_2X;
+    rect.top    = 0;
+    rect.right  = rect.left + BUTTON_WIDTH;
+    rect.bottom = rect.top + BUTTON_HEIGHT;
+    new_button(&rect, id++, MAIN_GROUP|0x0009 , "初始化", menu_func(0009));
+    
+    rect.left   = MENU_2X;
+    rect.top    = rect.top + BUTTON_HEIGHT + space;
+    rect.right  = rect.left + BUTTON_WIDTH;
+    rect.bottom = rect.top + BUTTON_HEIGHT;
+    new_button(&rect, id++, MAIN_GROUP|0x0009 , "其他任务1", menu_func(0009));
+    
+    rect.left   = MENU_2X;
+    rect.top    = rect.top + BUTTON_HEIGHT + space;
+    rect.right  = rect.left + BUTTON_WIDTH;
+    rect.bottom = rect.top + BUTTON_HEIGHT;
+    new_button(&rect, id++, MAIN_GROUP|0x0009 , "其他任务2", menu_func(0009));
+    
+    rect.left   = MENU_2X;
+    rect.top    = rect.top + BUTTON_HEIGHT + space;
+    rect.right  = rect.left + BUTTON_WIDTH;
+    rect.bottom = rect.top + BUTTON_HEIGHT;
+    new_button(&rect, id++, MAIN_GROUP|0x0009 , "其他任务3", menu_func(0009));
+
+
 
 
     return 0;
