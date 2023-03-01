@@ -10,7 +10,7 @@ FiltersCount=0
 CompilerSet=SDE Lite 4.5.2 for MIPS
 ExtIncludes=
 RTOSName=FreeRTOS
-UnitCount=209
+UnitCount=213
 
 [McuAndBSP]
 UseRTEMS=0
@@ -1043,3 +1043,19 @@ Folder=src
 [Unit209]
 FileName=my_img.h
 Folder=ls1x-drv/include
+
+[Unit210]
+FileName=MLX90614.c
+Folder=src
+
+[Unit211]
+FileName=MLX90614.h
+Folder=include
+
+[Unit212]
+FileName=rc522.c
+Folder=src
+
+[Unit213]
+FileName=rc522.h
+Folder=include

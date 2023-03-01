@@ -90,7 +90,7 @@ void func_task_HMC5883L(void* arg)
 
 
         sprintf(buf,"HCM5883L:%.2f°%s",temp,direction);
-        fb_fillrect(x + 9*8,y,x+200,y+16,cidxSILVER);
+        fb_fillrect(x + strlen("HCM5883L:")*8,y,x+200,y+16,cidxSILVER);
         fb_textout(x,y,buf);
 
         delay_ms(10);
@@ -107,7 +107,7 @@ void func_task_ultrasonic(void* arg)
     while(1)
     {
         sprintf(buf,"超声波:%.2f cm",Ultrasonic_Get_Dist());
-        fb_fillrect(x + 7*8,y,x+200,y+16,cidxSILVER);
+        fb_fillrect(x + strlen("超声波:")*8,y,x+200,y+16,cidxSILVER);
         fb_textout(x,y,buf);
 
         delay_ms(200);
@@ -124,7 +124,7 @@ void func_task_tempratrue(void* arg)
     while(1)
     {
         sprintf(buf,"温度:%.2f ℃",adc_get_temp());
-        fb_fillrect(x + 5*8,y,x+200,y+16,cidxSILVER);
+        fb_fillrect(x + strlen("温度:")*8,y,x+200,y+16,cidxSILVER);
         fb_textout(x,y,buf);
         delay_ms(400);
     }
@@ -140,7 +140,7 @@ void func_task_bh1750(void* arg)
     while(1)
     {
         sprintf(buf,"bh1750:%d lx",BH1750_Test());
-        fb_fillrect(x + 7*8,y,x+200,y+16,cidxSILVER);
+        fb_fillrect(x + strlen("bh1750:")*8,y,x+200,y+16,cidxSILVER);
         fb_textout(x,y,buf);
         delay_ms(400);
     }
@@ -156,22 +156,50 @@ void func_task_YY(void* arg)
     y = 50;
     fb_textout(x,y,"开始语音识别");
     fb_fillrect(x + 12*8,y,x+200,y+16,cidxSILVER);
-    while(1)
+    while(func_task_status[4][3])
     {
         flag = XiaoChuang_ASR();
-        if(flag==0x17)
+        
+        /*
+实践锻炼能力::实践锻炼能力:55022300
+比赛彰显才智::比赛彰显才智:55022400
+技能成就人生::技能成就人生:55022500
+人才改变世界::人才改变世界:55022600
+        */
+        
+        switch(flag)
         {
-            func_task_status[4][3]=0;
-            break;
+            case 0x17:
+                func_task_status[4][3]=0;
+                break;
+            case 0x12:
+                RGB_Set(RGB_COLOR_WHITE);
+                break;
+            case 0x13:
+                RGB_Set(RGB_COLOR_BLACK);
+                break;
+            case 0x23:
+                
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"实践锻炼能力");
+                break;
+            case 0x24:
+               
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"比赛彰显才智");
+                break;
+            case 0x25:
+                
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"技能成就人生");
+                break;
+            case 0x26:
+              
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"人才改变世界");
+                break;
         }
-        else if(flag == 0x12)
-        {
-            RGB_Set(RGB_COLOR_WHITE);
-        }
-        else if(flag == 0x13)
-        {
-            RGB_Set(RGB_COLOR_BLACK);
-        }
+        
         sprintf(buf,"识别结果:0x%X",flag);
         fb_fillrect(x + 9*8,y+16,x+200,y+16+16,cidxSILVER);
         fb_textout(x,y+16,buf);
@@ -188,6 +216,20 @@ void func_task_YY(void* arg)
 void func_task_SMG1()
 {
     int i;
+    /*5秒倒计时*/
+    SMG_DisplayP(0x11,0,5,0x11,1); 
+    delay_ms(1000);
+    SMG_DisplayP(0x11,0,4,0x11,1);
+    delay_ms(1000);
+    SMG_DisplayP(0x11,0,3,0x11,1);
+    delay_ms(1000);
+    SMG_DisplayP(0x11,0,2,0x11,1);
+    delay_ms(1000);
+    SMG_DisplayP(0x11,0,1,0x11,1);
+    delay_ms(1000);
+    SMG_DisplayP(0x11,0,0,0x11,1);
+    delay_ms(1000);
+
     for(i=0; i<3; i++)
     {
 
@@ -328,6 +370,19 @@ void func_task_Other1(void *arg)
 
 
 
+
+
+
+
+
+#define ADC_bit ((1<<12)-1) //12位adc
+#define WAVE_HEIGHT 300
+#define WAVE_WIDTH 480
+#define WAVE_SHOW_SX 300 //波形显示范围
+#define WAVE_SHOW_SY 0
+#define WAVE_SHOW_EX WAVE_SHOW_SX + WAVE_WIDTH
+#define WAVE_SHOW_EY WAVE_SHOW_SY + WAVE_HEIGHT
+
 QueueHandle_t ADCQueueHandle;
 void func_task_ADC(void *arg)
 {
@@ -341,20 +396,10 @@ void func_task_ADC(void *arg)
         sbuf = adc_get(ADC1);
         //printk("%d\n",sbuf);
         xQueueSend(ADCQueueHandle,&sbuf,5);
-        delay_ms(1);
+        taskYIELD();
     }
 }
 
-
-
-
-#define ADC_bit ((1<<12)-1) //12位adc
-#define WAVE_HEIGHT 300
-#define WAVE_WIDTH 400
-#define WAVE_SHOW_SX 300 //波形显示范围
-#define WAVE_SHOW_SY 0
-#define WAVE_SHOW_EX WAVE_SHOW_SX + WAVE_WIDTH
-#define WAVE_SHOW_EY WAVE_SHOW_SY + WAVE_HEIGHT
 
 void func_task_Wave(void *arg)
 {
@@ -375,6 +420,7 @@ void func_task_Wave(void *arg)
     {
         xQueueReceive(ADCQueueHandle,&buf,portMAX_DELAY);//等待队列数据
         y=WAVE_SHOW_SY+buf/(ADC_bit/WAVE_HEIGHT);//ADC值映射到指定显示范围
+
         if(WAVE_SHOW_SY<=y && y<=WAVE_SHOW_EY)
         {
             
@@ -416,7 +462,7 @@ void func_task_Wave(void *arg)
 
             #endif
         }
-        delay_ms(1);
+        taskYIELD();
         //fb_drawpixel(screen_x-1,);
 
         //delay_ms(500);

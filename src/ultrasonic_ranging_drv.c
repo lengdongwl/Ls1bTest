@@ -16,9 +16,9 @@
 
 
 extern void *devPWM2;
-// 按键中断的标志
-static bool flag = 0;
-static unsigned int cnt = 0;
+
+static bool flag = 0;//成功接收标志
+//static unsigned int cnt = 0;
 static float distance;
 static float last_distance;
 
@@ -64,6 +64,7 @@ void ECHO_irqhandler(int IRQn, void *param)
     ls1x_pwm_timer_stop(devPWM2);   //关闭定时器
     distance = Timer*1.7/10/1.2;		//（1.2为定时器补偿）/1.2
     Timer = 0;
+    flag = 1;//已接收标志
 }
 
 
@@ -102,6 +103,7 @@ void Ultrasonic_DeInit(void)
 float Ultrasonic_Get_Dist(void)
 {
     uint8_t i=0;
+    flag = 0;
     for(i=0; i<4; i++)
     {
         gpio_write(TRIG,1);
@@ -112,15 +114,23 @@ float Ultrasonic_Get_Dist(void)
     ls1x_pwm_timer_start(devPWM2,(void *)&pwm2_cfg);    //打开定时器
     delay_ms(100);
 
-    if(distance>=2000)
+    //判断是否成功接收到数据
+    if(flag)
     {
-        distance=2000;
-    }
-    if(distance<=0)
+        if(distance>=2000)//最大范围
+        {
+            distance=2000;
+        }
+        if(distance<=0)//数据错误 显示上一次数据
+        {
+            distance=last_distance;
+        }
+        last_distance=distance;
+    }else
     {
-        distance=last_distance;
+        return 9999.99;//超过范围
     }
-    last_distance=distance;
+    
     return distance;
 }
 

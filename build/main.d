@@ -18,6 +18,7 @@ main.o main.o: ../main.c ../FreeRTOS/include/FreeRTOS.h \
  ../FreeRTOS/port/include/ls1b_irq.h ../FreeRTOS/include/semphr.h \
  ../FreeRTOS/include/queue.h ../include/bsp.h ../include/adc.h \
  ../ls1x-drv/include/i2c/ads1015.h ../ls1x-drv/include/ls1x_io.h \
+ ../include/MLX90614.h ../include/rc522.h \
  ../ls1x-drv/include/i2c/gt1151.h ../.\gui\demo_gui.h \
  ../.\gui\/.\simple-gui\simple_gui.h ../include/queue_list.h \
  ../.\gui\simple-gui\simple_gui.h ../ls1x-drv/include/ls1x_fb.h \
@@ -105,6 +106,10 @@ main.o main.o: ../main.c ../FreeRTOS/include/FreeRTOS.h \
 ../ls1x-drv/include/i2c/ads1015.h:
 
 ../ls1x-drv/include/ls1x_io.h:
+
+../include/MLX90614.h:
+
+../include/rc522.h:
 
 ../ls1x-drv/include/i2c/gt1151.h:
 

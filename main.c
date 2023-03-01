@@ -17,7 +17,8 @@
 #include "bh1750.h"
 #include "ls1x_i2c_bus.h"
 #include "adc.h"
-
+#include "MLX90614.h"
+#include "rc522.h"
 #include "i2c/gt1151.h"
 #include ".\gui\demo_gui.h"
 #include ".\gui\simple-gui\simple_gui.h"
@@ -340,6 +341,12 @@ void init_task()
     UART4_Config_Init(); //语音识别
     HCM5883L_Init(); //磁力计
     Motor_GPIO_Config();//直流电机
+    
+    /*P4*/
+    //MLX90614_Init();//红外测温
+    //RC522_Init();
+    
+    
     SMG_Init();//数码管
 
 }
@@ -363,6 +370,8 @@ int main(void)
     sprintf(buf,"x=%d,y=%d\n",fb_get_pixelsx(),fb_get_pixelsy());
     fb_cons_puts(buf);
 
+
+//    while(1){printk("Temp=%d\n",RC_check());delay_ms(500);}
 
     /*
     注：电机线可能影响gui的启动

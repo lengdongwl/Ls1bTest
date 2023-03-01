@@ -236,7 +236,7 @@ static void func_onclick_0003(unsigned msg, void *param)
     {
         if(func_task_status[4][4]==pdPASS)return;
         func_task_status[4][4]=xTaskCreate(menu_task(bh1750),
-                                           "tasktempratrue",
+                                           "taskbh1750",
                                            2048,
                                            NULL,
                                            10,
@@ -280,8 +280,10 @@ static void func_onclick_0004(unsigned msg, void *param)
     }
     else if(!(strcmp(btn->caption,"语音播报")))
     {
-        UART4_Send(0x01);
-
+        //UART4_Send(0x01);
+        
+        //喜迎二十大、永远跟党走、奋进新征程
+        UART4_Send(0xAF);
     }
     else if(!(strcmp(btn->caption,"语音识别")))
     {

@@ -19,7 +19,9 @@ C_SRCS += \
 ../src/bkrc_voice.c \
 ../src/motor_drv.c \
 ../src/adc.c \
-../src/mytask.c
+../src/mytask.c \
+../src/MLX90614.c \
+../src/rc522.c
 
 OBJS += \
 ./src/install_3th_libraries.o \
@@ -37,7 +39,9 @@ OBJS += \
 ./src/bkrc_voice.o \
 ./src/motor_drv.o \
 ./src/adc.o \
-./src/mytask.o
+./src/mytask.o \
+./src/MLX90614.o \
+./src/rc522.o
 
 C_DEPS += \
 ./src/install_3th_libraries.d \
@@ -55,7 +59,9 @@ C_DEPS += \
 ./src/bkrc_voice.d \
 ./src/motor_drv.d \
 ./src/adc.d \
-./src/mytask.d
+./src/mytask.d \
+./src/MLX90614.d \
+./src/rc522.d
 
 # Each subdirectory must supply rules for building sources it contributes
 src/%.o: ../src/%.c
