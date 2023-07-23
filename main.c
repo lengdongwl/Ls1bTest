@@ -179,8 +179,196 @@ void test()
     fb_cons_puts( "ok test\n");
 
 }
+void func_task_YyY(void* arg)
+{
+    volatile int x,y;
+    volatile char flag=0;
+    volatile char buf[50];
+    printk("func_task_YY thread started!\n");
+    x = 400;
+    y = 50;
+    fb_textout(x,y,"开始语音识别");
+    fb_fillrect(x + 12*8,y,x+200,y+16,cidxSILVER);
+    while(func_task_status[4][3])
+    {
+        flag = XiaoChuang_ASR();
+
+        /*
+实践锻炼能力::实践锻炼能力:55022300
+比赛彰显才智::比赛彰显才智:55022400
+技能成就人生::技能成就人生:55022500
+人才改变世界::人才改变世界:55022600
+        */
+
+        switch(flag)
+        {
+            case 0x17:
+                func_task_status[4][3]=0;
+                break;
+            case 0x12:
+                RGB_Set(RGB_COLOR_WHITE);
+                break;
+            case 0x13:
+                RGB_Set(RGB_COLOR_BLACK);
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxBLACK);
+                fb_textout(x,y+16*2,"请关灯");
+                break;
+            case 0x14:
+                RGB_Set(RGB_COLOR_RED);
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxBLACK);
+                fb_textout(x,y+16*2,"请开红灯");
+                break;
+            case 0x15:
+                RGB_Set(RGB_COLOR_GREEN);
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxBLACK);
+                fb_textout(x,y+16*2,"请开绿灯");
+                break;
+            case 0x16:
+                RGB_Set(RGB_COLOR_BLUE);
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxBLACK);
+                fb_textout(x,y+16*2,"请开蓝灯");
+                break;
+                break;
+            case 0x23:
+
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"实践锻炼能力");
+                break;
+            case 0x24:
+
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"比赛彰显才智");
+                break;
+            case 0x25:
+
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"技能成就人生");
+                break;
+            case 0x26:
+
+                fb_fillrect(x ,y+16*2,x+200,y+16*3,cidxSILVER);
+                fb_textout(x,y+16*2,"人才改变世界");
+                break;
+        }
+
+        sprintf(buf,"识别结果:0x%X",flag);
+        fb_fillrect(x + 9*8,y+16,x+200,y+16+16,cidxSILVER);
+        fb_textout(x,y+16,buf);
+        delay_ms(10);
+    }
+    fb_fillrect(x,y,x+200,y+16,cidxSILVER);
+    fb_fillrect(x,y+16,x+200,y+16+16,cidxSILVER);
+    vTaskDelete(NULL);//结束本任务
+
+}
+
+void task_bh(void* arg)
+{
+    volatile int x,y;
+    volatile char buf[50];
+    printk("func_task_bh1750 thread started!\n");
+
+    x = 500;
+    y = 42*4+20*4;
+    while(1)
+    {
+        if(!strcmp(pcTaskGetName(arg),"bh1750"))
+        {
+            sprintf(buf,"当前光照度:%d LX",BH1750_Test());
+        }else
+        {
+            sprintf(buf,"当前光照度:%.4d LX",BH1750_Test());
+        }
+        fb_fillrect(x + strlen("当前光照度:")*8,y,x+200,y+16,cidxBLACK);
+        fb_textout(x,y,buf);
+        delay_ms(400);
+    }
+}
 
 
+void tempratrue1(void* arg)
+{
+    volatile int x,y;
+    volatile char buf[50];
+    printk("func_task_tempratrue thread started!\n");
+    x = 500;
+    y = 42*3+20*3;
+    while(1)
+    {
+        sprintf(buf,"当前温度:%.1f℃",adc_get_temp());
+        fb_fillrect(x + strlen("当前温度:")*8,y,x+200,y+16,cidxBLACK);
+        fb_textout(x,y,buf);
+        delay_ms(400);
+    }
+}
+
+void TESTSMG(unsigned char a)
+{
+    switch(a)
+    {
+        case 1:
+            RGB_Set(RGB_COLOR_RED);
+    delay_ms(1000);
+    RGB_Set(RGB_COLOR_BLACK);
+    delay_ms(1000);
+    RGB_Set(RGB_COLOR_GREEN);
+    delay_ms(1000);
+    RGB_Set(RGB_COLOR_BLACK);
+    delay_ms(1000);
+    RGB_Set(RGB_COLOR_BLUE);
+    delay_ms(1000);
+    RGB_Set(RGB_COLOR_BLACK);
+            break;
+        case 2:
+            BEEP_On();
+            break;
+        case 3:
+            BEEP_Off();
+            break;
+        case 4:
+            xTaskCreate(func_task_YyY,
+                                       "YY",
+                                       2048,
+                                       NULL,
+                                       10,
+                                       NULL);
+            break;
+        case 5:
+            SMG_DisplayP(2,0,2,3,1);
+            
+            break;
+        case 6:
+            fb_textout(400,0,"青春飞扬遍天地,意气风发转乾坤。");
+            break;
+        case 7:
+            xTaskCreate(tempratrue1,
+                                       "tasktempratrue",
+                                       2048,
+                                       NULL,
+                                       10,
+                                       0);
+            break;
+        case 8:
+
+             xTaskCreate(task_bh,
+                                       "bh1750",
+                                       2048,
+                                       NULL,
+                                       10,
+                                       0);
+
+           break;
+        case 9:
+            xTaskCreate(task_bh,
+                                       "bh1750_4",
+                                       2048,
+                                       NULL,
+                                       10,
+                                      0);
+            break;
+
+    }
+}
 
 int current_group = 0;
 TButton *current_btn = 0;
@@ -195,6 +383,11 @@ void unfocused(void)
         focused_button_by_guid(current_btn->guid,false);
     }
 }
+
+
+//#define SMGMODE 1
+unsigned char SMGFLAG=0;
+
 static void key_task(void *arg)
 {
     printk("key_task thread started!\n");
@@ -241,6 +434,11 @@ static void key_task(void *arg)
 #endif
 
 
+#if (SMGMODE)
+    SMGFLAG--;
+    SMG_DisplayP(0,0,0,SMGFLAG,1);
+#endif
+
 
                 break;
             case 2:
@@ -282,7 +480,10 @@ static void key_task(void *arg)
                 }
 #endif
 
-
+#if (SMGMODE)
+    SMGFLAG++;
+    SMG_DisplayP(0,0,0,SMGFLAG,1);
+#endif
 
                 break;
                 
@@ -299,6 +500,9 @@ static void key_task(void *arg)
                 }
 #endif
 
+#if (SMGMODE)
+   TESTSMG(SMGFLAG);
+#endif
                 
                 break;
             case 4:

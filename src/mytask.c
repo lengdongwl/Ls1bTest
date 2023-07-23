@@ -375,7 +375,7 @@ void func_task_Other1(void *arg)
 
 
 
-#define ADC_bit ((1<<12)-1) //12位adc
+#define ADC_bit 1000//((1<<12)-1) //12位adc //y的最大范围
 #define WAVE_HEIGHT 300
 #define WAVE_WIDTH 480
 #define WAVE_SHOW_SX 300 //波形显示范围
@@ -394,6 +394,8 @@ void func_task_ADC(void *arg)
     {
 
         sbuf = adc_get(ADC1);
+        //sbuf = BH1750_Test();
+        
         //printk("%d\n",sbuf);
         xQueueSend(ADCQueueHandle,&sbuf,5);
         taskYIELD();
@@ -421,11 +423,14 @@ void func_task_Wave(void *arg)
         xQueueReceive(ADCQueueHandle,&buf,portMAX_DELAY);//等待队列数据
         y=WAVE_SHOW_SY+buf/(ADC_bit/WAVE_HEIGHT);//ADC值映射到指定显示范围
 
+        //计算图上的y起点  WAVE_SHOW_SY + WAVE_HEIGHT
+        y=WAVE_SHOW_SY + WAVE_HEIGHT - y; //映射到图表
+
         if(WAVE_SHOW_SY<=y && y<=WAVE_SHOW_EY)
         {
             
 
-            #if 0
+            #if 1
             //由于中间数据为全部移动，速度慢
             //头部删除
             fb_drawline(WAVE_SHOW_SX,WAVE_SHOW_SY,WAVE_SHOW_SX,WAVE_SHOW_EY,cidxSILVER);
@@ -437,7 +442,7 @@ void func_task_Wave(void *arg)
             fb_drawpixel(WAVE_SHOW_EX,y,cidxRED);
             #else
 
-            if(i<=WAVE_WIDTH)
+            if(i<=WAVE_WIDTH)//不到宽度不显示
             {
                 buf_arr[i++] = y;
             }else
